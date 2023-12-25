@@ -8,10 +8,9 @@ from gymnasium import spaces
 
 class RecoEnv(Env):
     # Environment static properties
-    # metadata = {"render.modes": ["human", "logger"]}
     metadata = {"render_modes": ["human", "logger"]}
     id = "reco-v0"
-    actions = np.eye(5)
+    actions = np.eye(5)  # simple one hot encoding 5 possbile actions, rating from 0->4, dang one-hot-encoding
 
     def __init__(self, data: pd.DataFrame, item: pd.DataFrame, user: pd.DataFrame, seed: int = 1):
         """
@@ -41,7 +40,7 @@ class RecoEnv(Env):
         self.total_correct_predictions = 0
         # convert data to numpy for faster training
         self.data = self.data.values
-        # other openAI.gym specific variables
+        # other openAI.gym specific variables, Discrete space is used for actions
         self.action_space = spaces.Discrete(len(RecoEnv.actions))
         self.observation_space = spaces.Box(
             low=-1.0, high=5.0, shape=self._get_observation(step_number=0).shape, dtype=np.float32
@@ -209,7 +208,13 @@ class RecoEnv(Env):
         user_age = self.user_info[user_id]["age"]
         user_occupation = self.user_info[user_id]["occupation"]
         user_gender = self.user_info[user_id]["gender"]
-        # features
+        # features,
+        # user_mean: a single-elementwith shape (1,)
+        # movie_mean: a single-element with shape(1,)
+        # movie_genre_bucket: array wih shape (19,)
+        # age_bucket: an array with shape (7,)
+        # occupation_bucket: an array with shape (21,)
+        # gender_bucket: an array with shape (2,)
         user_mean = np.array([self.user_mean.get(user_id, 3.0) / 5.0], dtype=np.float32)
         movie_mean = np.array([self.movie_mean.get(movie_id, 3.0) / 5.0], dtype=np.float32)
         movie_genre_bucket = self._get_movie_genre_buckets(movie_id=movie_id)
