@@ -1,7 +1,6 @@
 import argparse
 import os
 from datetime import datetime as dt
-
 import gymnasium as gym
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import SubprocVecEnv
@@ -15,7 +14,8 @@ parser.add_argument(
     "--tensorboard_log", default="./tensorboard", help="Logging directory for TensorBoard log", type=str
 )
 parser.add_argument("--save_model", default=True, help="Save model after training (True = yes | False = no)", type=bool)
-parser.add_argument("--training_steps", default=int(1e6), help="Number of steps to performing training", type=int)
+parser.add_argument("--training_steps", default=int(1e4), help="Number of steps to performing training", type=int)
+# parser.add_argument("--training_steps", default=int(1e6), help="Number of steps to performing training", type=int)
 parser.add_argument(
     "--evaluation_steps", default=int(1e5), help="Number of steps to performing on evaluation", type=int
 )
@@ -29,12 +29,16 @@ user_args = vars(parser.parse_args())
 def main(kwargs: dict):
     start_time = dt.now()
     number_of_cpu = os.cpu_count()
-    envs = SubprocVecEnv(
-        [
-            lambda: gym.make(gym_recommendation.RecoEnv.id, **gym_recommendation.import_data_for_env())
-            for _ in range(number_of_cpu)
-        ]
-    )
+    # envs = SubprocVecEnv(
+    #     [
+    #         lambda: gym.make(gym_recommendation.RecoEnv.id, **gym_recommendation.import_data_for_env())
+    #         for _ in range(number_of_cpu)
+    #     ]
+    # )
+
+    envs = SubprocVecEnv([lambda: gym.make(gym_recommendation.RecoEnv.id, **gym_recommendation.import_data_for_env())])
+
+    # envs = gym.make(gym_recommendation.RecoEnv.id, **gym_recommendation.import_data_for_env())
 
     print(kwargs)
 
@@ -50,7 +54,7 @@ def main(kwargs: dict):
         "max_grad_norm": 0.5,
         "gae_lambda": 0.95,
         "clip_range_vf": 0.3,
-        "verbose": 0,
+        "verbose": 1,
         "_init_setup_model": True,
         "device": "cpu",
     }

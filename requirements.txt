@@ -1,6 +1,10 @@
 pandas
 requests
 numpy
-gymnasium
+gymnasium==0.29.1
 pytest
 stable-baselines3
+stable-baselines3[extra]
+# setuptools==65.5.0
+# wheel==0.38.0
+# shimmy>=0.2.1

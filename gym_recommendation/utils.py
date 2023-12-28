@@ -125,20 +125,21 @@ def evaluate(model: BaseAlgorithm, env: RecoEnv, num_steps: int = 1000) -> None:
     Evaluate a RL agent
     """
     start_time = dt.now()
-    obs = env.reset()
+    obs, info = env.reset()
     step_count = 0
     episode_number = 1
-    for i in range(num_steps):
+    for _ in range(num_steps):
         step_count += 1
         action, _states = model.predict(obs)
-        obs, reward, done, info = env.step(action)
+
+        obs, reward, done, truncated, info = env.step(action)
         if done:
             elapsed = (dt.now() - start_time).seconds
             print(f"**************EPISODE #{episode_number}****************")
             print(f"Total steps = {step_count} | steps/second = {step_count / elapsed}")
             print(f"Total correct predictions = {env.total_correct_predictions}")
             print(f"Prediction accuracy = {env.total_correct_predictions / step_count}")
-            obs = env.reset()
+            obs, info = env.reset()
             step_count = 0
             episode_number += 1
             start_time = dt.now()

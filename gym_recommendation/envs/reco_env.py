@@ -2,8 +2,12 @@ from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
+
 from gymnasium import Env
 from gymnasium import spaces
+
+# from gym import Env
+# from gym import spaces
 
 
 class RecoEnv(Env):
@@ -11,6 +15,7 @@ class RecoEnv(Env):
     metadata = {"render_modes": ["human", "logger"]}
     id = "reco-v0"
     actions = np.eye(5)  # simple one hot encoding 5 possbile actions, rating from 0->4, dang one-hot-encoding
+    render_mode = "human"
 
     def __init__(self, data: pd.DataFrame, item: pd.DataFrame, user: pd.DataFrame, seed: int = 1):
         """
@@ -55,6 +60,7 @@ class RecoEnv(Env):
         if self.done:
             truncated = True
             self.observation = self.reset()
+            # return self.observation, self.reward, self.done, {}
             return self.observation, self.reward, self.done, truncated, {}
         self.action = action
         self.reward = self._get_reward(action=action, step_number=self.local_step_number)
@@ -65,6 +71,7 @@ class RecoEnv(Env):
             self.done = True
         self.local_step_number += 1
 
+        # return self.observation, self.reward, self.done, {}
         return self.observation, self.reward, self.done, truncated, {}
 
     def reset(self, seed=None, options=None) -> np.ndarray:
@@ -72,7 +79,7 @@ class RecoEnv(Env):
         Reset the environment to an initial state
         """
         # We need the following line to seed self.np_random
-        super().reset(seed=seed)
+        # super().reset(seed=seed)
 
         self.local_step_number = 0
         self.reward = 0.0
